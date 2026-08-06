@@ -8,6 +8,8 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+	CUSTOM_ENV: "my-custom-env"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -17,3 +19,13 @@ jobs:
 
       - name: Display index.html content
         run: cat ./app/index.html
+
+ - name: Display secrets and env vars
+        env:
+          FAKE_API_TOKEN: ${{ secrets.FAKE_API_TOKEN }}
+          ENV_TYPE: ${{ secrets.ENV_TYPE }}
+        run: |
+          echo "FAKE_API_TOKEN=${FAKE_API_TOKEN}"
+          echo "ENV_TYPE=${ENV_TYPE}"
+          echo "CUSTOM_ENV=${CUSTOM_ENV}"
+          echo "RUNNER_OS=${RUNNER_OS}"
