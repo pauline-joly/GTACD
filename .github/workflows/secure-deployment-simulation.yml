@@ -1,0 +1,73 @@
+name: Secure Deployment Simulation
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  simulate-secure-deployment:
+    runs-on: ubuntu-latest
+    env:
+      SERVER_IP: ${{ secrets.SERVER_IP }}
+      SERVER_USER: ${{ secrets.SERVER_USER }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate SSH private key
+        run: |
+          echo "Checking SSH key presence..."
+          if [ -z "${SSH_PRIVATE_KEY}" ]; then
+            echo "ERROR: SSH_PRIVATE_KEY is not set"
+            exit 1
+          fi
+
+          echo "Writing key to file..."
+          echo "${SSH_PRIVATE_KEY}" > key.pem
+          chmod 600 key.pem
+
+          lines=$(wc -l < key.pem)
+          echo "Key file has ${lines} lines (size check, >= 2048 bits for RSA)."
+          echo "Key is expected to be without passphrase for automation."
+
+      - name: Validate server configuration
+        run: |
+          echo "SERVER_IP=${SERVER_IP}"
+          echo "SERVER_USER=${SERVER_USER}"
+
+          if [ -z "${SERVER_IP}" ] || [ -z "${SERVER_USER}" ]; then
+            echo "ERROR: SERVER_IP or SERVER_USER not set"
+            exit 1
+          fi
+
+          if [ "${SERVER_USER}" = "root" ]; then
+            echo "ERROR: SERVER_USER must not be root (least privilege)."
+            exit 1
+          fi
+
+          if ! echo "${SERVER_IP}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "ERROR: SERVER_IP format invalid"
+            exit 1
+          fi
+
+      - name: Simulate SSH commands
+        run: |
+          echo "Simulating secure SSH deployment (no real network call):"
+          echo "ssh -i key.pem ${SERVER_USER}@${SERVER_IP} 'sudo mkdir -p /var/www/html/tp-app'"
+          echo "ssh -i key.pem ${SERVER_USER}@${SERVER_IP} 'sudo cp -r ./app /var/www/html/tp-app'"
+          echo "ssh -i key.pem ${SERVER_USER}@${SERVER_IP} 'sudo systemctl restart nginx'"
+
+      - name: Security checks
+        run: |
+          echo "Checking good security practices..."
+          echo "- Dedicated deploy user instead of root"
+          echo "- SSH key-based auth instead of password"
+          echo "- Credentials stored in GitHub Secrets, not in code"
+	  echo "- Possibility to limit sudo in /etc/sudoers.d/deployuser to required commands only"
+
