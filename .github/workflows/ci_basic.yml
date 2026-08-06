@@ -20,7 +20,7 @@ jobs:
       - name: Display index.html content
         run: cat ./app/index.html
 
- - name: Display secrets and env vars
+      - name: Display secrets and env vars
         env:
           FAKE_API_TOKEN: ${{ secrets.FAKE_API_TOKEN }}
           ENV_TYPE: ${{ secrets.ENV_TYPE }}
