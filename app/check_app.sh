@@ -16,4 +16,4 @@ else
 fi
 
 echo "=== Vérification terminée avec succès ==="
-exit 0
+exit 1
