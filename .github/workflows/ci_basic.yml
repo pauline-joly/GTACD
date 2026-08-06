@@ -9,7 +9,8 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     env:
-	CUSTOM_ENV: "my-custom-env"
+      CUSTOM_ENV: "my-custom-env"
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
