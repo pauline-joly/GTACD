@@ -69,4 +69,4 @@ jobs:
           echo "- Dedicated deploy user instead of root"
           echo "- SSH key-based auth instead of password"
           echo "- Credentials stored in GitHub Secrets, not in code"
-	  echo "- Possibility to limit sudo in /etc/sudoers.d/deployuser to required commands only"
+		  echo "- Possibility to limit sudo in /etc/sudoers.d/deployuser to required commands only"
